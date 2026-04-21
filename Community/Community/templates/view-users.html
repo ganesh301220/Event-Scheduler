@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+{% block title %}Registered Users{% endblock %}
+
+{% block content %}
+
+<div class="site-container py-5">
+
+    <h2 style="margin-bottom:16px;">Registered Users</h2>
+
+    <!-- SEARCH -->
+    <form method="get" style="margin-bottom:20px;">
+        <input
+            type="text"
+            name="q"
+            value="{{ query }}"
+            placeholder="Search username or email..."
+            class="search-input"
+        >
+    </form>
+
+    <div class="user-table-wrapper">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Joined</th>
+                    <th>Status</th>
+                    <th>Participations</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+
+                    <!-- CLICKABLE USERNAME -->
+                    <td>
+                        <a href="javascript:void(0)"
+                           onclick="openModal('{{ user.id }}')"
+                           class="user-link">
+                            {{ user.username }}
+                        </a>
+                    </td>
+
+                    <td>{{ user.email|default:"—" }}</td>
+                    <td>{{ user.date_joined|date:"d M Y" }}</td>
+
+                    <td>
+                        {% if user.is_active %}
+                            <span class="badge badge-active">Active</span>
+                        {% else %}
+                            <span class="badge badge-inactive">Blocked</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <span class="badge badge-count">
+                            {{ user.participation_count }}
+                        </span>
+                    </td>
+
+                    <td class="actions">
+                        <a href="{% url 'toggle_user' user.id %}"
+                           class="btn btn-sm btn-warning">
+                           {% if user.is_active %}Block{% else %}Unblock{% endif %}
+                        </a>
+
+                        <a href="{% url 'delete_user' user.id %}"
+                           class="btn btn-sm btn-danger"
+                           onclick="return confirm('Delete this user?');">
+                           Delete
+                        </a>
+                    </td>
+                </tr>
+
+                <!-- ================= MODAL ================= -->
+                <div class="modal-overlay" id="modal-{{ user.id }}">
+                    <div class="modal-card">
+
+                        <!-- HEADER -->
+                        <div class="modal-header">
+                            <div class="avatar">
+                                {{ user.username|slice:":1"|upper }}
+                            </div>
+                            <div>
+                                <h3>{{ user.username }}</h3>
+                                <p>{{ user.email|default:"No email" }}</p>
+                            </div>
+                            <button class="close-x" onclick="closeModal('{{ user.id }}')">×</button>
+                        </div>
+
+                        <!-- BODY -->
+                        <div class="modal-body">
+                            <div class="info-grid">
+                                <div>
+                                    <span>Joined</span>
+                                    <strong>{{ user.date_joined|date:"d M Y" }}</strong>
+                                </div>
+                                <div>
+                                    <span>Status</span>
+                                    {% if user.is_active %}
+                                        <strong class="text-active">Active</strong>
+                                    {% else %}
+                                        <strong class="text-blocked">Blocked</strong>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <span>Total Participations</span>
+                                    <strong>{{ user.participation_count }}</strong>
+                                </div>
+                            </div>
+
+                            <h4>Event Participations</h4>
+
+                            {% if user.event_participations.all %}
+                                <ul class="event-list">
+                                    {% for p in user.event_participations.all %}
+                                    <li>
+                                        <div class="event-title">{{ p.event.title }}</div>
+                                        <div class="event-meta">
+                                            {{ p.event.location }} •
+                                            {{ p.participated_at|date:"d M Y, h:i A" }}
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="empty-text">No participations yet.</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- FOOTER -->
+                        <div class="modal-footer">
+                            <button onclick="closeModal('{{ user.id }}')" class="btn-close">
+                                Close
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align:center;">
+                        No users found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <br>
+    <a href="/admin-dashboard/"
+       class="btn-secondary"
+       style="border:1px solid rgb(71,156,248);
+              padding:7px;
+              border-radius:5px;
+              text-decoration:none;
+              background:linear-gradient(90deg,rgb(201,236,255),rgb(255,221,227));">
+        ← Back to Dashboard
+    </a>
+
+</div>
+
+<!-- MODAL SCRIPT -->
+<script>
+function openModal(id) {
+    document.getElementById("modal-" + id).style.display = "flex";
+}
+
+function closeModal(id) {
+    document.getElementById("modal-" + id).style.display = "none";
+}
+</script>
+
+<!-- STYLES -->
+<style>
+.search-input {
+    padding: 10px 14px;
+    width: 260px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+}
+
+.user-link {
+    color: #2563eb;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.user-table-wrapper {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.user-table th,
+.user-table td {
+    padding: 14px 16px;
+    font-size: 14px;
+}
+
+.user-table th {
+    background: #f8fafc;
+    font-weight: 700;
+}
+
+.user-table tr:not(:last-child) {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.badge {
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 999px;
+}
+
+.badge-active { background:#dcfce7; color:#166534; }
+.badge-inactive { background:#fef3c7; color:#92400e; }
+.badge-count { background:#e0f2fe; color:#075985; }
+
+.actions a { margin-right: 6px; }
+
+/* MODAL */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-card {
+    width: 480px;
+    background: linear-gradient(180deg,#ffffff,#f9fafb);
+    border-radius: 18px;
+    animation: pop .25s ease;
+    box-shadow: 0 25px 50px rgba(0,0,0,.35);
+}
+
+@keyframes pop {
+    from { transform: scale(.92); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.avatar {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg,#60a5fa,#a78bfa);
+    color: white;
+    font-weight: 800;
+    font-size: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-x {
+    margin-left: auto;
+    font-size: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.modal-body {
+    padding: 18px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.info-grid span {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.event-list {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-left: 0;
+    list-style: none;
+}
+
+.event-list li {
+    padding: 10px;
+    border-radius: 10px;
+    background: #f8fafc;
+    margin-bottom: 8px;
+}
+
+.event-title {
+    font-weight: 700;
+}
+
+.event-meta {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.modal-footer {
+    padding: 14px;
+    text-align: right;
+}
+
+.btn-close {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+}
+</style>
+
+{% endblock %}

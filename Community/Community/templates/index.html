@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}Community Event Scheduler{% endblock %}
+
+{% block content %}
+
+<!-- ================= HERO SECTION ================= -->
+<section style="
+    background: linear-gradient(120deg, #eef2ff, #ffffff);
+    padding: 80px 20px;
+">
+    <div class="container" style="
+        display:grid;
+        grid-template-columns: 1fr 1fr;
+        gap:40px;
+        align-items:center;
+    ">
+
+        <!-- LEFT CONTENT -->
+        <div>
+            <h1 style="
+                font-size:2.6rem;
+                font-weight:800;
+                color:#1e293b;
+                margin-bottom:16px;
+            ">
+                Discover & Join<br>
+                Community Events Near You
+            </h1>
+
+            <p style="
+                font-size:1.05rem;
+                color:#475569;
+                margin-bottom:28px;
+                max-width:520px;
+            ">
+                Stay updated with upcoming community events, workshops,
+                festivals, and activities happening around you.
+                Connect, participate, and grow together.
+            </p>
+
+            <div style="display:flex; gap:14px; flex-wrap:wrap;">
+                <a href="#events" class="btn-primary">
+                    Explore Events
+                </a>
+                <a href="/login/" class="btn-ghost">
+                    Login
+                </a>
+            </div>
+        </div>
+
+        <!-- RIGHT IMAGE -->
+        <div>
+            <img src="https://source.unsplash.com/900x600/?community,event"
+                 alt="Community Events"
+                 style="
+                    width:100%;
+                    border-radius:18px;
+                    box-shadow:0 20px 40px rgba(15,23,42,0.15);
+                 ">
+        </div>
+
+    </div>
+</section>
+
+<!-- ================= FEATURES SECTION ================= -->
+<section style="padding:70px 20px;">
+    <div class="container">
+
+        <h2 style="
+            text-align:center;
+            font-size:2rem;
+            font-weight:700;
+            margin-bottom:50px;
+        ">
+            Why Use Community Event Scheduler?
+        </h2>
+
+        <div style="
+            display:grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap:30px;
+        ">
+
+            <div class="card">
+                <h3>📅 Easy Event Discovery</h3>
+                <p>Find upcoming events with clear date, time, and location details.</p>
+            </div>
+
+            <div class="card">
+                <h3>🎟 Free & Paid Events</h3>
+                <p>Attend free meetups or register for premium workshops.</p>
+            </div>
+
+            <div class="card">
+                <h3>👥 Community Driven</h3>
+                <p>Connect with people, organizations, and local communities.</p>
+            </div>
+
+            <div class="card">
+                <h3>⚡ Real-Time Updates</h3>
+                <p>Stay informed about newly added and updated events.</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ================= UPCOMING EVENTS ================= -->
+<section id="events" class="events-grid" style="padding:60px 20px; background:#f8fafc;">
+    <div class="container">
+        <h2 style="
+            text-align:center;
+            font-size:2rem;
+            font-weight:700;
+            margin-bottom:40px;
+        ">
+            Upcoming Events
+        </h2>
+
+        <div class="events-wrapper">
+
+            {% for event in upcoming_events %}
+            <article class="event-card">
+
+                {% if event.image %}
+                    <img src="{{ event.image.url }}" alt="{{ event.title }}">
+                {% else %}
+                    <img src="https://source.unsplash.com/600x400/?event,community" alt="Event">
+                {% endif %}
+
+                <div class="event-body">
+                    <div>
+                        <h3 class="event-title">{{ event.title }}</h3>
+                        <p class="event-desc">{{ event.location }}</p>
+                        <p class="event-time">
+                            {{ event.start_datetime|date:"D, M d, Y · h:i A" }}
+                        </p>
+                    </div>
+
+                    <div class="event-footer">
+                        {% if event.is_paid %}
+                            <span class="badge-paid">Paid</span>
+                        {% else %}
+                            <span class="badge-free">Free</span>
+                        {% endif %}
+                        <a href="#" class="view-btn">View</a>
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty">
+                No upcoming events found.
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</section>
+
+<!-- ================= CALL TO ACTION ================= -->
+<section style="
+    padding:70px 20px;
+    background: linear-gradient(120deg, #4f46e5, #4338ca);
+    color:#fff;
+    text-align:center;
+">
+    <h2 style="font-size:2.2rem; font-weight:700; margin-bottom:14px;">
+        Ready to Join the Community?
+    </h2>
+
+    <p style="max-width:600px; margin:0 auto 26px;">
+        Login now to stay updated with events, participate, and connect
+        with your local community.
+    </p>
+
+    <a href="/login/" class="btn-primary" style="background:#fff; color:#4338ca;">
+        Get Started
+    </a>
+</section>
+
+{% endblock %}

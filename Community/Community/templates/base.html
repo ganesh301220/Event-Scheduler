@@ -1,0 +1,1038 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Community Event Scheduler{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+
+    {% block extra_css %}{% endblock %}
+</head>
+<style>
+    /* ================= ROOT & GLOBAL ================= */
+    :root {
+        --primary: #4f46e5;
+        --secondary: #06b6d4;
+        --success: #16a34a;
+        --bg-main: #f7fafc;
+        --bg-soft: #f1f5ff;
+        --border: #e5e7eb;
+        --text-dark: #0f172a;
+        --text-muted: #475569;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Inter, system-ui, sans-serif;
+        background: var(--bg-main);
+        color: var(--text-dark);
+    }
+
+    /* ================= PREMIUM NAVBAR ================= */
+.main-nav {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    padding: 14px 32px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+
+    animation: navFadeDown 0.6s ease;
+}
+
+/* NAVBAR ENTRY */
+@keyframes navFadeDown {
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* LEFT SIDE */
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* LOGO */
+.nav-logo {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    transition: transform 0.35s ease;
+}
+
+.nav-left:hover .nav-logo {
+    transform: rotate(-6deg) scale(1.05);
+}
+
+/* BRAND */
+.brand {
+    font-weight: 900;
+    font-size: 1.45rem;
+    letter-spacing: 0.6px;
+    text-decoration: none;
+
+    background: linear-gradient(90deg, #4f46e5, #ff43ad, #22c55e);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+
+    animation: brandGradient 4s ease infinite;
+}
+
+@keyframes brandGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* LINKS */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+/* LINK BASE */
+.nav-links a {
+    position: relative;
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 8px 12px;
+    border-radius: 10px;
+    transition: color 0.25s ease;
+}
+
+/* GRADIENT UNDERLINE */
+.nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 4px;
+    width: 0%;
+    height: 2px;
+    background: linear-gradient(90deg, #4f46e5, #ff43ad);
+    border-radius: 99px;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.nav-links a:hover::after {
+    width: 70%;
+}
+
+.nav-links a:hover {
+    color: #4f46e5;
+}
+
+/* ACTIVE LINK */
+.nav-links a.active {
+    color: #fff;
+    background: linear-gradient(135deg, #4f46e5, #ff43ad);
+}
+
+/* CTA BUTTON */
+.nav-btn {
+    position: relative;
+    padding: 9px 20px;
+    border-radius: 14px;
+    font-weight: 700;
+    text-decoration: none;
+
+    color: #4f46e5 !important;
+    border: 1px solid transparent;
+
+    background:
+        linear-gradient(#fff, #fff) padding-box,
+        linear-gradient(135deg, #4f46e5, #ff43ad) border-box;
+
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* CTA GLOW */
+.nav-btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #4f46e5, #ff43ad);
+    opacity: 0.25;
+    filter: blur(16px);
+    z-index: -1;
+    transition: opacity 0.25s ease;
+}
+
+.nav-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 30px rgba(79, 70, 229, 0.35);
+}
+
+.nav-btn:hover::after {
+    opacity: 0.6;
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+    .main-nav {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .nav-links {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}
+
+
+    /* ================= CONTAINER ================= */
+    .container {
+        max-width: 100%;
+        margin: auto;
+        padding: 0 16px;
+    }
+
+    /* ===== FULL WIDTH HOME PAGE ===== */
+    .site-container {
+        width: 100%;
+        max-width: 100%;
+        padding-left: 32px;
+        padding-right: 32px;
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+        background: linear-gradient(180deg,
+                rgba(79, 70, 229, 0.06),
+                rgba(6, 182, 212, 0.02));
+        border-radius: 14px;
+        padding: 28px;
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 8px 30px rgba(79, 70, 229, 0.04);
+    }
+
+    .hero h1 {
+        font-size: 1.9rem;
+        margin-bottom: 8px;
+    }
+
+    .hero p {
+        color: #6b7280;
+    }
+
+    /* ===== SEARCH ===== */
+    .search-strip {
+        margin-top: 14px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .search-input {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid rgba(15, 23, 42, 0.04);
+        min-width: 260px;
+    }
+
+    .search-input input {
+        border: none;
+        outline: none;
+        width: 200px;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn-ghost {
+        padding: 10px 14px;
+        border-radius: 10px;
+        background: transparent;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        color: #0d6efd;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        padding: 10px 14px;
+        border-radius: 10px;
+        background: linear-gradient(90deg, #4f46e5, #06b6d4);
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    /* ===== HERO RIGHT ===== */
+    .hero-visual-box {
+        width: 180px;
+        height: 200px;
+        margin-right: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: #0d6efd;
+    }
+
+    /* ===== EVENTS GRID ===== */
+    .events-wrapper {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .event-card {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid rgba(15, 23, 42, 0.03);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgb(137, 137, 255);
+    }
+
+    .event-card:hover {
+        transform: translateY(-6px);
+        transition: all 0.3s ease;
+    }
+
+    .event-card img {
+        height: 200px;
+        object-fit: cover;
+        width: 100%;
+    }
+
+    .event-body {
+        padding: 12px;
+        flex: 1;
+    }
+
+    .event-title {
+        font-size: 1rem;
+        margin-bottom: 4px;
+    }
+
+    .event-desc {
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+    }
+
+    .event-time {
+        font-size: 0.8rem;
+    }
+
+    .event-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 6px;
+    }
+
+    .card-highlight {
+        background: linear-gradient(90deg, rgb(232, 245, 255), rgb(255, 228, 248));
+        padding: 0px 0px 0px 15px;
+        border-radius: 10px;
+    }
+
+    /* ===== BADGES & CTA ===== */
+    .badge-free {
+        background: #198754;
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 9px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .badge-paid {
+        background: linear-gradient(90deg, red, orange);
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 9px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .view-btn {
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid #0d6efd;
+        color: #0d6efd;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .view-btn:hover {
+        background: #0d6efd;
+        color: #fff;
+        transition: all 0.25s ease;
+    }
+
+    /* ===== EMPTY ===== */
+    .empty {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 28px;
+        color: #6b7280;
+        border: 2px dashed rgba(15, 23, 42, 0.06);
+        border-radius: 12px;
+    }
+
+    /* Footer inside card */
+    .event-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 18px;
+    }
+
+    /* Badges & Buttons */
+    .badge-free {
+        background: var(--success);
+        color: #fff;
+        padding: 6px 14px;
+        border-radius: 14px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .btn-view {
+        border: 1px solid #2563eb;
+        color: #2563eb;
+        padding: 6px 16px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    /* ================= FOOTER ================= */
+    footer {
+        margin-top: 60px;
+        padding: 22px;
+        text-align: center;
+        border-top: 1px solid var(--border);
+        background: #ffffff;
+        color: #6b7280;
+        font-size: 0.95rem;
+    }
+
+    /* ================= RESPONSIVE ================= */
+    @media (max-width: 900px) {
+        .hero-box {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .hero-left p {
+            max-width: 100%;
+        }
+    }
+
+
+    /* Login page css start */
+    /* ================= AUTH PAGES (UPDATED) ================= */
+    .auth-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    /* Split wrapper */
+    .auth-split {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        width: 100%;
+        max-width: 900px;
+        background: #ffffff;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+    }
+
+    /* ================= LEFT: LOGIN CARD ================= */
+    .auth-card {
+        background: #fff;
+        padding: 42px;
+        width: 100%;
+        text-align: left;
+        box-shadow: none;
+    }
+
+    .auth-card h2 {
+        font-weight: 800;
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+    }
+
+    .auth-card p {
+        margin-bottom: 26px;
+        color: #6b7280;
+        font-size: 0.95rem;
+    }
+
+    /* ================= FORM ================= */
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 11px 14px;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        outline: none;
+        font-size: 0.95rem;
+    }
+
+    .form-group input:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.12);
+    }
+
+    /* remember + forgot row */
+    .form-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+    }
+
+    .remember {
+        font-size: 0.9rem;
+        color: #475569;
+    }
+
+    /* ================= LINKS ================= */
+    .auth-links {
+        margin-top: 22px;
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .auth-links span {
+        margin: 0 8px;
+        color: #9ca3af;
+    }
+
+    .link,
+    .auth-links a {
+        text-decoration: none;
+        color: #4f46e5;
+        font-weight: 600;
+    }
+
+    .link:hover,
+    .auth-links a:hover {
+        text-decoration: underline;
+    }
+
+    /* ================= RIGHT: SIDE PANEL ================= */
+    .auth-side {
+        background: linear-gradient(135deg, #f1f5ff, #ecfeff);
+        padding: 44px;
+        color: #0f172a;
+    }
+
+    .auth-side h4 {
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .auth-side p {
+        font-size: 0.95rem;
+        color: #475569;
+        line-height: 1.6;
+    }
+
+    .auth-side hr {
+        border: none;
+        border-top: 1px solid #e5e7eb;
+        margin: 24px 0;
+    }
+
+    /* ================= RESPONSIVE ================= */
+    @media (max-width: 900px) {
+        .auth-split {
+            grid-template-columns: 1fr;
+        }
+
+        .auth-side {
+            display: none;
+        }
+
+        .auth-card {
+            padding: 32px;
+        }
+    }
+
+    /* Login page css end */
+    /* ----------------------------------------------------- */
+    /* Signup page CSS start */
+    /* ===== GOOGLE AUTH BUTTON ===== */
+    .btn-google {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 11px 14px;
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        color: #0f172a;
+        margin-bottom: 18px;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-google img {
+        width: 18px;
+        height: 18px;
+    }
+
+    .btn-google:hover {
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+        transform: translateY(-1px);
+    }
+
+    /* Divider */
+    .divider {
+        text-align: center;
+        margin: 14px 0 20px;
+        position: relative;
+    }
+
+    .divider span {
+        background: #fff;
+        padding: 0 10px;
+        color: #6b7280;
+        font-size: 0.85rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .divider::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        height: 1px;
+        background: #e5e7eb;
+    }
+
+    .required span {
+        color: red;
+    }
+
+    /* Signup page css ends */
+
+
+    /* Admin-dashboard-create events css starts*/
+    /* ================= MODAL ================= */
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+    }
+
+    .modal-box {
+        background: #fff;
+        width: 100%;
+        max-width: 800px;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .close-btn {
+        font-size: 26px;
+        cursor: pointer;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 12px;
+    }
+
+    textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        resize: none;
+    }
+
+    select {
+        width: 100%;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .site-footer {
+        background: #0f172a;
+        /* dark navy */
+        color: #cbd5f5;
+        padding: 50px 20px 20px;
+        margin-top: 60px;
+    }
+
+    .footer-container {
+        max-width: 1200px;
+        margin: auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 32px;
+    }
+
+    .footer-section h3,
+    .footer-section h4 {
+        color: #ffffff;
+        margin-bottom: 14px;
+    }
+
+    .footer-section p {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #c7d2fe;
+    }
+
+    .footer-section ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .footer-section ul li {
+        margin-bottom: 8px;
+    }
+
+    .footer-section ul li a {
+        color: #c7d2fe;
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.2s ease;
+    }
+
+    .footer-section ul li a:hover {
+        color: #ffffff;
+    }
+
+    .footer-bottom {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid #1e293b;
+        text-align: center;
+        font-size: 13px;
+        color: #94a3b8;
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+        .site-footer {
+            text-align: center;
+        }
+    }
+
+    /* Admin-dashboard-create events css ends*/
+
+
+    /* Profile dropdown styles starts */
+.profile-menu {
+    position: relative;
+}
+
+.profile-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4f46e5, #fa37c6);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* DROPDOWN */
+.profile-dropdown {
+    position: absolute;
+    top: 48px;
+    right: 0;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    width: 180px;
+    padding: 12px;
+    display: none;
+    z-index: 9999;   /* 🔥 IMPORTANT */
+}
+
+.profile-dropdown.show {
+    display: block;
+}
+
+.profile-dropdown a {
+    display: block;
+    padding: 8px 10px;
+    text-decoration: none;
+    color: #334155;
+    border-radius: 8px;
+}
+
+.profile-dropdown a:hover {
+    background: #f1f5f9;
+}
+
+.profile-name {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #1e293b;
+
+    /* 🔥 FIX OVERFLOW */
+    max-width: 100%;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+}
+
+
+
+    /* Profile dropdown ends */
+</style>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+<nav class="main-nav">
+
+    <!-- LEFT : LOGO + BRAND -->
+    <div class="nav-left">
+        <img src="{% static 'images/logo.png' %}" alt="Logo" class="nav-logo">
+
+        <!-- Brand click → Admin dashboard / User home -->
+        <a href="{% if user.is_authenticated and user.is_staff %}
+                    {% url 'admin_dashboard' %}
+                 {% else %}
+                    /
+                 {% endif %}"
+           class="brand">
+            CommunityEvents
+        </a>
+    </div>
+
+    <!-- RIGHT : LINKS -->
+    <div class="nav-links">
+
+        <!-- HOME -->
+        <a href="{% if user.is_authenticated and user.is_staff %}
+                    {% url 'admin_dashboard' %}
+                 {% else %}
+                    /
+                 {% endif %}"
+           class="{% if request.path == '/' or '/admin-dashboard' in request.path %}active{% endif %}">
+            Home
+        </a>
+
+        <!-- USER ONLY LINKS -->
+        {% if not user.is_staff %}
+            <a href="{% url 'all_events' %}"
+               class="{% if '/events' in request.path %}active{% endif %}">
+                Events
+            </a>
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'my_events' %}"
+                   class="{% if '/my-events' in request.path %}active{% endif %}">
+                    My Events
+                </a>
+            {% endif %}
+        {% endif %}
+
+        <!-- ABOUT -->
+        <a href="{% url 'about' %}"
+           class="{% if '/about' in request.path %}active{% endif %}">
+            About
+        </a>
+
+        <!-- CONTACT -->
+        <a href="/contact/"
+           class="{% if '/contact' in request.path %}active{% endif %}">
+            Contact
+        </a>
+
+        {% if user.is_authenticated %}
+            <!-- PROFILE DROPDOWN -->
+            <div class="profile-menu">
+
+                <div class="profile-icon" onclick="toggleProfileMenu(event)">
+                    {{ user.username|slice:":1"|upper }}
+                </div>
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <p class="profile-name">{{ user.username }}</p>
+                    <hr>
+
+                    {% if not user.is_staff %}
+                        <a href="{% url 'user_profile' %}">My Profile</a>
+                    {% endif %}
+
+                    <a href="{% url 'logout' %}"
+                       style="background-color:#fee2e2; color:#991b1b;">
+                        Logout
+                    </a>
+                </div>
+
+            </div>
+        {% else %}
+            <a href="{% url 'login' %}" class="nav-btn">Login</a>
+        {% endif %}
+
+    </div>
+</nav>
+
+
+    
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="site-footer">
+        <div class="footer-container">
+
+            <div class="footer-section">
+                <h3>Community Event Scheduler</h3>
+                <p>
+                    Bringing people together through local events, workshops,
+                    meetups, and community activities.
+                </p>
+            </div>
+
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'signup' %}">Create Account</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="/contact/">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <p>Email: support@ganesh.com</p>
+                <p>Phone: +91 9766798711</p>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            © 2025 Community Event Scheduler. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- ================= PROFILE DROPDOWN SCRIPT ================= -->
+    <script>
+        function toggleProfileMenu(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById("profileDropdown");
+            dropdown.classList.toggle("show");
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", function () {
+            const dropdown = document.getElementById("profileDropdown");
+            if (dropdown) {
+                dropdown.classList.remove("show");
+            }
+        });
+
+        AOS.init();
+    </script>
+
+</body>
+
+
+
+</html>

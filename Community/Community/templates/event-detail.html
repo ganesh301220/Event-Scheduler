@@ -1,0 +1,401 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ event.title }} — Event Details{% endblock %}
+
+{% block content %}
+<div class="site-container py-5" style="margin-top:18px;" data-aos="fade-right" data-aos-duration="1500">
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<!-- ================= EVENT CARD ================= -->
+<div class="event-horizontal-card">
+
+    <!-- LEFT : IMAGE -->
+    <div class="event-card-image">
+        {% if event.image %}
+            <img src="{{ event.image.url }}" alt="{{ event.title }}">
+        {% else %}
+            <img src="https://source.unsplash.com/800x500/?event,community">
+        {% endif %}
+    </div>
+
+    <!-- RIGHT : CONTENT -->
+    <div class="event-card-content">
+
+        <!-- TITLE -->
+        <div class="title-row">
+            <h1 class="event-title">{{ event.title }}</h1>
+            <img src="{% static 'images/sale-sale.png' %}" class="sale-tag">
+        </div>
+
+        <!-- META -->
+        <div class="event-meta">
+            <span>📍 {{ event.location }}</span>
+            <span>🕒 {{ event.start_datetime|date:"D, M d, Y · h:i A" }}</span>
+        </div>
+
+        <!-- DESCRIPTION -->
+        <p class="event-description">
+            {{ event.description|default:"No description available." }}
+        </p>
+
+        <!-- ⭐ RATING -->
+        <div class="rating-box">
+            <strong>Rating:</strong>
+            ⭐ {{ event.average_rating }}/5
+            <small>({{ event.ratings.count }} reviews)</small>
+            
+        </div>
+
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'rate_event' event.id %}" class="rating-form">
+            {% csrf_token %}
+            {% for i in "12345" %}
+                <button type="submit"
+                        name="rating"
+                        value="{{ forloop.counter }}"
+                        class="star-btn {% if user_rating and user_rating.rating >= forloop.counter %}active{% endif %}">
+                    ⭐
+                </button>
+            {% endfor %}
+        </form>
+        {% else %}
+            <p class="login-note"><a href="{% url 'login' %}">Login</a> to rate</p>
+        {% endif %}
+
+        <!-- MAP -->
+        <div class="map-section">
+            <iframe
+                src="https://www.google.com/maps?q={{ event.location|urlencode }}&output=embed"
+                loading="lazy">
+            </iframe>
+
+            
+        </div>
+
+        <!-- FOOTER -->
+        <div class="event-footer">
+
+            <!-- PRICE BADGE -->
+            <div>
+                {% if event.is_paid %}
+                    <span class="badge badge-paid">💳 Paid • ₹{{ event.price }}</span>
+                {% else %}
+                    <span class="badge badge-free">🎉 Free</span>
+                {% endif %}
+            </div>
+
+            <!-- ACTION BAR -->
+            <div class="event-actions">
+                <div class="map-actions">
+                <a href="https://www.google.com/maps/dir/?api=1&destination={{ event.location|urlencode }}"
+                   target="_blank"
+                   class="route-btn">
+                    🧭 Get Directions
+                </a>
+            </div>
+                <a href="{% url 'home' %}" class="btn-secondary" style="border: 1px solid rgb(94, 134, 255); padding: 8px; 
+                border-radius: 9px; text-decoration: none; color: blue">← Back</a>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'participate_event' event.id %}" class="btn-primary">
+                        Participate
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}?next={% url 'participate_event' event.id %}"
+                       class="btn-primary">
+                        Login to Participate
+                    </a>
+                {% endif %}
+
+                <a href="{% url 'event_discussion' event.id %}" class="btn-secondary" style="border: 1px solid rgb(94, 134, 255); padding: 8px; 
+                border-radius: 9px; text-decoration: none; color: blue">
+                    💬 Discussion
+                </a>
+            </div>
+        </div>
+ 
+    </div>
+</div>
+
+<!-- ================= EXTRA CONTENT (PREMIUM) ================= -->
+<section class="extra-wrapper">
+
+    <div class="extra-card">
+        <div class="extra-text">
+            <h3>About This Event</h3>
+            <p>
+                This community event is designed to bring people together,
+                encourage collaboration, and provide meaningful learning
+                experiences in a welcoming environment.
+            </p>
+        </div>
+        <div class="extra-image">
+            <img src="{% static 'images/about-event.png' %}" alt="About Event">
+        </div>
+    </div>
+
+    <div class="extra-card">
+        <div class="extra-text">
+            <h3>Event Highlights</h3>
+            <ul>
+                <li>Expert speakers & interactive workshops</li>
+                <li>Networking opportunities</li>
+                <li>Participation certificates</li>
+            </ul>
+        </div>
+        <div class="extra-image">
+            <img src="{% static 'images/highlight.png' %}" alt="Highlights">
+        </div>
+    </div>
+
+    <div class="extra-card">
+        <div class="extra-text">
+            <h3>Organizer Information</h3>
+            <p>
+                <strong>Community Event Scheduler</strong><br>
+                📧 support@communityevents.com
+            </p>
+        </div>
+        <div class="extra-image">
+            <img src="{% static 'images/organizer.png' %}" alt="Organizer">
+        </div>
+    </div>
+
+    <div class="extra-card">
+        <div class="extra-text">
+            <h3>Rules & Guidelines</h3>
+            <ul>
+                <li>Please arrive at least 15 minutes early</li>
+                <li>Carry valid ID proof</li>
+                <li>Maintain decorum throughout the event</li>
+            </ul>
+        </div>
+        <div class="extra-image">
+            <img src="{% static 'images/rules.png' %}" alt="Rules">
+        </div>
+    </div>
+
+</section>
+
+
+
+</div>
+
+<!-- ================= STYLES ================= -->
+<style>
+.event-horizontal-card {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    border: 1px solid #53cbff;
+}
+
+.event-card-image { flex: 0 0 40%; }
+.event-card-image img { width: 100%; height: 100%; object-fit: cover; }
+
+.event-card-content {
+    flex: 1;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+}
+
+.title-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.sale-tag { height: 80px; }
+
+.event-meta {
+    display: flex;
+    gap: 14px;
+    font-size: 14px;
+    background: #f1f5f9;
+    padding: 8px;
+    border-radius: 8px;
+    width: fit-content;
+}
+
+.rating-box { margin: 12px 0; }
+
+.rating-form {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.star-btn {
+    background: none;
+    border: none;
+    font-size: 26px;
+    cursor: pointer;
+    color: #cbd5e1;
+}
+.star-btn.active { color: #facc15; }
+
+.map-section iframe {
+    width: 100%;
+    height: 220px;
+    border-radius: 14px;
+    border: none;
+}
+
+.map-actions {
+    margin-top: 10px;
+    text-align: right;
+}
+
+.route-btn {
+    padding: 10px 18px;
+    background: #eef2ff;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    color: #4338ca;
+}
+
+.event-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.event-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.badge-free {
+    background: linear-gradient(135deg,#22c55e,#86efac);
+}
+.badge-paid {
+    background: linear-gradient(135deg,#ef4444,#fca5a5);
+    color: white;
+}
+
+/* ================= EXTRA CONTENT PREMIUM ================= */
+
+.extra-wrapper {
+    max-width: 1200px;
+    margin: 60px auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+    padding: 0 16px;
+}
+
+.extra-card {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+
+    background: linear-gradient(30deg, #ffffff, #e8f0f8);
+    border-radius: 14px;
+    padding: 26px;
+
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Gradient left border */
+.extra-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 9px;
+    height: 100%;
+    border-radius: 14px 0 0 14px;
+    background: linear-gradient(to bottom, #3284e9, #ef4444);
+}
+
+.extra-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+}
+
+.extra-text {
+    flex: 1;
+    padding-right: 10px;
+}
+
+.extra-card h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+    color: #1e3a8a;
+}
+
+.extra-card p,
+.extra-card ul {
+    color: #475569;
+    line-height: 1.6;
+    font-size: 15px;
+}
+
+.extra-card ul {
+    padding-left: 18px;
+}
+
+.extra-card ul li {
+    margin-bottom: 6px;
+}
+
+/* IMAGE RIGHT SIDE */
+.extra-image {
+    flex-shrink: 0;
+}
+
+.extra-image img {
+    width: 120px;
+    height: auto;
+    object-fit: contain;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .extra-wrapper {
+        grid-template-columns: 1fr;
+        margin: 40px auto;
+    }
+
+    .extra-card {
+        flex-direction: column-reverse;
+        text-align: center;
+    }
+
+    .extra-text {
+        padding-right: 0;
+    }
+
+    .extra-image img {
+        width: 70px;
+        margin-bottom: 10px;
+    }
+}
+
+</style>
+
+{% endblock %}

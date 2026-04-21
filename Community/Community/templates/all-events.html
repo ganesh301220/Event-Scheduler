@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}All Events — Community Event Scheduler{% endblock %}
+
+{% block content %}
+<div class="site-container py-5">
+
+    <h1 style="margin-bottom:20px;">All Events</h1>
+<!-- 🔍 LOCATION SEARCH -->
+<form method="get" class="event-search">
+    <input type="text"
+           name="location"
+           placeholder="Search by location..."
+           value="{{ search_location }}"
+           class="search-input">
+
+    {% if filter_type != "all" %}
+        <input type="hidden" name="type" value="{{ filter_type }}">
+    {% endif %}
+
+    <button type="submit" class="search-btn">
+        Search
+    </button>
+</form>
+
+    <!-- 🔍 FILTER BUTTONS -->
+    <div class="event-filters">
+        <a href="{% url 'all_events' %}"
+           class="filter-btn {% if filter_type == 'all' %}active{% endif %}">
+            All
+        </a>
+
+        <a href="{% url 'all_events' %}?type=free"
+           class="filter-btn {% if filter_type == 'free' %}active{% endif %}">
+            Free
+        </a>
+
+        <a href="{% url 'all_events' %}?type=paid"
+           class="filter-btn {% if filter_type == 'paid' %}active{% endif %}">
+            Paid
+        </a>
+    </div>
+
+    <section class="events-grid">
+        <div class="events-wrapper">
+
+            {% for event in events %}
+            <article class="event-card" data-aos="fade-up" data-aos-duration="1500">
+
+                {% if event.image %}
+                    <img src="{{ event.image.url }}" alt="{{ event.title }}">
+                {% else %}
+                    <img src="https://source.unsplash.com/600x400/?event,community" alt="Event Image">
+                {% endif %}
+
+                <div class="event-body">
+                    <div>
+                        <h3 class="event-title">{{ event.title }}</h3>
+                        <p class="event-desc">{{ event.location }}</p>
+                        <p class="event-time">
+                            {{ event.start_datetime|date:"D, M d, Y · h:i A" }}
+                        </p>
+                    </div>
+
+                    <div class="event-footer">
+                        {% if event.is_paid %}
+                            <span class="badge-paid">Paid</span>
+                        {% else %}
+                            <span class="badge-free">Free</span>
+                        {% endif %}
+
+                        <a href="{% url 'event_detail' event.id %}" class="view-btn">
+                            View
+                        </a>
+                    </div>
+                </div>
+
+            </article>
+            {% empty %}
+            <div class="empty">No events found.</div>
+            {% endfor %}
+
+        </div>
+    </section>
+
+</div>
+<style>
+    .event-filters {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 30px;
+}
+
+.filter-btn {
+    padding: 8px 20px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    color: #334155;
+    background: #f1f5f9;
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+    background: #e0e7ff;
+}
+
+.filter-btn.active {
+    background: linear-gradient(90deg, #4f46e5, #e4309f);
+    color: #fff;
+}
+.event-search {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+}
+
+.search-input {
+    flex: 1;
+    min-width: 240px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    font-size: 14px;
+}
+
+.search-btn {
+    padding: 10px 22px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+    background: #4f46e5;
+    color: #fff;
+    cursor: pointer;
+}
+
+.search-btn:hover {
+    background: #4338ca;
+}
+
+</style>
+{% endblock %}

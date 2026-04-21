@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Contact Us — Community Event Scheduler{% endblock %}
+
+{% block content %}
+
+<div class="auth-container" >
+    <div class="auth-split">
+
+        <!-- LEFT : CONTACT FORM -->
+        <div class="auth-card auth-left">
+            <h2>Contact Us</h2>
+            <p class="subtitle">
+                Have questions, suggestions, or issues?  
+                We’d love to hear from you.
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+
+               <div style="display: flex; gap: 15px;">
+                 <div class="form-group">
+                    <label>Full Name <span>*</span> </label>
+                    <input type="text" name="name" placeholder="Enter your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email <span>*</span></label>
+                    <input type="email" name="email" placeholder="you@example.com" required>
+                </div>
+
+               </div>
+
+                <div class="form-group">
+                    <label>Subject <span>*</span></label>
+                    <input type="text" name="subject" placeholder="Reason for contacting us" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Message <span>*</span></label>
+                    <textarea name="message" rows="4"
+                        placeholder="Write your message here..." required></textarea>
+                </div>
+
+                <button type="submit"
+                        class="btn-primary w-100"
+                        style="border:none; width: 100%;" >
+                    Send Message
+                </button>
+            </form>
+
+            <div class="auth-links">
+                <a href="{% url 'home' %}" class="link">
+                    ← Back to Home
+                </a>
+            </div>
+        </div>
+
+        <!-- RIGHT : CONTACT INFO -->
+        <div class="auth-side">
+            <h4>Get in Touch</h4>
+            <p>
+                📧 <strong>Email:</strong> support@communityevents.com<br>
+                📞 <strong>Phone:</strong> +91 98765 43210<br>
+                📍 <strong>Address:</strong> Pune, Maharashtra, India
+            </p>
+
+            <hr>
+
+            <h4>Support Hours</h4>
+            <p>
+                Monday – Friday<br>
+                9:00 AM – 6:00 PM
+            </p>
+
+            <p style="margin-top:16px; font-size:14px;">
+                We usually respond within 24 hours.
+            </p>
+        </div>
+
+    </div>
+</div>
+<style>
+    span{
+        color: red;
+    }
+</style>
+{% endblock %}

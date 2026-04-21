@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block title %}Manage Events{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+<!-- ================= PAGE HEADER ================= -->
+<div class="page-header">
+    <div>
+        <h2>Manage Events</h2>
+        <p>All events created in the system</p>
+    </div>
+
+    <a href="/admin-dashboard/" class="btn-ghost back-btn" style="border: 1px solid rgb(171, 171, 255);">
+        ← Back to Dashboard
+    </a>
+</div>
+
+
+    <!-- ================= SEARCH BAR ================= -->
+    <div class="search-wrapper">
+        <input type="text"
+               id="eventSearch"
+               placeholder="🔍 Search events by title, location, description...">
+    </div>
+
+    <!-- MESSAGES -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-success">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if events %}
+
+    <div class="events-grid">
+
+        <!-- ================= UPCOMING EVENTS ================= -->
+        <div>
+            <h3>🟢 Upcoming Events</h3>
+
+            {% for event in events %}
+            {% if event.status == "upcoming" %}
+            <div class="event-card searchable">
+
+                <div class="event-main">
+                    {% if event.image %}
+                        <img src="{{ event.image.url }}" class="event-img">
+                    {% endif %}
+
+                    <div class="event-info">
+                        <h4 class="search-title">{{ event.title }}</h4>
+                        <p class="muted search-desc">
+                            {{ event.description|default:"No description" }}
+                        </p>
+
+                        <p class="small search-location">
+                            📍 {{ event.location }} |
+                            🕒 {{ event.start_datetime|date:"d M Y, H:i" }}
+                        </p>
+
+                        {% if event.is_paid %}
+                            <span class="price paid">₹ {{ event.price }}</span>
+                        {% else %}
+                            <span class="price free">Free</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="event-actions">
+                    <a href="/edit-event/{{ event.id }}/" class="btn-primary">Edit</a>
+                    <a href="/event/{{ event.id }}/participants/" class="btn-primary">View Participants</a>
+                    <a href="/mark-completed/{{ event.id }}/" class="btn-primary">Mark Completed</a>
+                    <a href="/delete-event/{{ event.id }}/"
+                       class="btn-ghost"
+                       onclick="return confirm('Delete this event?');">
+                        Delete
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- ================= COMPLETED EVENTS ================= -->
+        <div>
+            <h3>✅ Completed Events</h3>
+
+            {% for event in events %}
+            {% if event.status == "completed" %}
+            <div class="event-card completed searchable">
+
+                <div class="event-main">
+                    {% if event.image %}
+                        <img src="{{ event.image.url }}" class="event-img">
+                    {% endif %}
+
+                    <div class="event-info">
+                        <h4 class="search-title">{{ event.title }}</h4>
+                        <p class="muted search-desc">
+                            {{ event.description|default:"No description" }}
+                        </p>
+
+                        <p class="small search-location">
+                            📍 {{ event.location }} |
+                            🕒 {{ event.start_datetime|date:"d M Y, H:i" }}
+                        </p>
+
+                        <span class="price free">Completed</span>
+                    </div>
+                </div>
+
+                <div class="event-actions">
+                    <a href="/event/{{ event.id }}/participants/" class="btn-primary">View Participants</a>
+                    <a href="/mark-upcoming/{{ event.id }}/" class="btn-primary">Mark Upcoming</a>
+                    <a href="/delete-event/{{ event.id }}/"
+                       class="btn-ghost"
+                       onclick="return confirm('Delete this event?');">
+                        Delete
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+    </div>
+
+    {% else %}
+        <p>No events found.</p>
+    {% endif %}
+</div>
+
+<!-- ================= STYLES ================= -->
+<style>
+    /* PAGE HEADER */
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+}
+
+/* BACK BUTTON RIGHT */
+.back-btn{
+    white-space:nowrap;
+    margin-top:6px;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+    .page-header{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .back-btn{
+        align-self:flex-end;
+    }
+}
+
+.search-wrapper{
+    margin: 25px 0;
+}
+.search-wrapper input{
+    width:100%;
+    padding:14px 18px;
+    border-radius:12px;
+    border:1px solid #e5e7eb;
+    font-size:15px;
+    outline:none;
+}
+.search-wrapper input:focus{
+    border-color:#6366f1;
+    box-shadow:0 0 0 3px rgba(99,102,241,0.15);
+}
+
+.events-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:30px;
+    margin-top:30px;
+}
+
+.event-card{
+    background:#fff;
+    padding:18px;
+    border-radius:14px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.06);
+    margin-bottom:18px;
+}
+
+.event-card.completed{
+    background:#f8fafc;
+}
+
+.event-main{
+    display:flex;
+    gap:16px;
+}
+
+.event-img{
+    width:100px;
+    height:80px;
+    object-fit:cover;
+    border-radius:10px;
+}
+
+.event-info h4{
+    margin:0;
+}
+
+.muted{color:#64748b}
+.small{font-size:0.85rem}
+
+.price.free{color:#16a34a;font-weight:600}
+.price.paid{color:#dc2626;font-weight:600}
+
+.event-actions{
+    display:flex;
+    gap:10px;
+    margin-top:14px;
+    flex-wrap:wrap;
+}
+
+@media(max-width:900px){
+    .events-grid{grid-template-columns:1fr}
+}
+</style>
+
+<!-- ================= SEARCH SCRIPT ================= -->
+<script>
+const searchInput = document.getElementById("eventSearch");
+const cards = document.querySelectorAll(".searchable");
+
+searchInput.addEventListener("keyup", function () {
+    const value = this.value.toLowerCase();
+
+    cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        card.style.display = text.includes(value) ? "block" : "none";
+    });
+});
+</script>
+
+{% endblock %}

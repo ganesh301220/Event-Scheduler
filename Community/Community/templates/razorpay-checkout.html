@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+<script>
+var options = {
+    "key": "{{ razorpay_key }}",
+    "amount": "{{ order.amount }}",
+    "currency": "INR",
+    "name": "Community Event Scheduler",
+    "description": "{{ event.title }}",
+    "order_id": "{{ order.id }}",
+
+    "handler": function (response) {
+        window.location.href =
+            "{% url 'payment_success' %}?payment_id=" + response.razorpay_payment_id;
+    },
+
+    "prefill": {
+        "name": "{{ request.user.get_full_name }}",
+        "email": "{{ request.user.email }}"
+    },
+
+    "theme": {
+        "color": "#4f46e5"
+    }
+};
+
+var rzp = new Razorpay(options);
+rzp.open();
+</script>
+
+</body>
+</html>

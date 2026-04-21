@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Edit Event{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Edit Event</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- TITLE -->
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" name="title" value="{{ event.title }}" required>
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description">{{ event.description }}</textarea>
+        </div>
+
+        <!-- LOCATION -->
+        <div class="form-group">
+            <label>Location</label>
+            <input type="text" name="location" value="{{ event.location }}" required>
+        </div>
+
+        <!-- STATUS -->
+        <div class="form-group">
+            <label>Status</label>
+            <select name="status">
+                <option value="upcoming" {% if event.status == "upcoming" %}selected{% endif %}>Upcoming</option>
+                <option value="ongoing" {% if event.status == "ongoing" %}selected{% endif %}>Ongoing</option>
+                <option value="completed" {% if event.status == "completed" %}selected{% endif %}>Completed</option>
+            </select>
+        </div>
+
+        <!-- CURRENT IMAGE PREVIEW -->
+        <div class="form-group">
+            <label>Current Event Image</label><br>
+            {% if event.image %}
+                <img src="{{ event.image.url }}"
+                     alt="Event Image"
+                     style="max-width:220px; border-radius:10px; margin-bottom:10px;">
+            {% else %}
+                <p style="color:#64748b;">No image uploaded</p>
+            {% endif %}
+        </div>
+
+        <!-- UPLOAD NEW IMAGE -->
+        <div class="form-group">
+            <label>Change Event Image</label>
+            <input type="file" name="image" accept="image/*">
+            <small style="color:#64748b;">
+                Upload a new image only if you want to replace the current one
+            </small>
+        </div>
+
+        <!-- ACTIONS -->
+        <button type="submit" class="btn-primary" style="border:none;">
+            Update Event
+        </button>
+        <a href="/manage-events/" class="btn-ghost">Cancel</a>
+    </form>
+</div>
+{% endblock %}

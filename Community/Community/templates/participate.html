@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Participate — {{ event.title }}{% endblock %}
+
+{% block content %}
+
+<div class="auth-container">
+    <div class="auth-split">
+
+        <!-- LEFT : FORM / PAYMENT -->
+        <div class="auth-card auth-left">
+
+            <h2>Event Participation</h2>
+            <p class="subtitle">
+                {% if event.is_paid %}
+                    Step 1: Fill details → Step 2: Complete payment
+                {% else %}
+                    Fill in the details to confirm your participation
+                {% endif %}
+            </p>
+
+            <!-- ================= MESSAGES ================= -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-success">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- ================= PARTICIPATION FORM ================= -->
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label>Full Name <span>*</span></label>
+                    <input type="text"
+                           name="name"
+                           value="{{ request.user.get_full_name }}"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email <span>*</span></label>
+                    <input type="email"
+                           name="email"
+                           value="{{ request.user.email }}"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label>Mobile Number <span>*</span></label>
+                    <input type="tel"
+                           name="mobile"
+                           placeholder="10-digit mobile number"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label>Message (Optional)</label>
+                    <textarea name="message" rows="3"></textarea>
+                </div>
+
+                {% if event.is_paid %}
+                    <!-- STEP 2 BUTTON -->
+                    <button type="submit"
+                            class="btn-primary w-100"
+                            style="border:none;"
+                            onclick="return confirmPayment();">
+                        Proceed to Payment (₹{{ event.price }})
+                    </button>
+
+                    <p class="info-note">
+                        💳 You will be asked to confirm payment after submitting details.
+                    </p>
+                {% else %}
+                    <!-- FREE EVENT -->
+                    <button type="submit"
+                            class="btn-primary w-100"
+                            style="border:none;">
+                        Confirm Registration
+                    </button>
+
+                    <p class="success-note">
+                        ✅ This is a free event. Registration will complete instantly.
+                    </p>
+                {% endif %}
+            </form>
+
+            <div class="auth-links">
+                <a href="{% url 'event_detail' event.id %}" class="link">
+                    ← Back to Event
+                </a>
+            </div>
+        </div>
+
+        <!-- RIGHT : EVENT INFO -->
+        <div class="auth-side">
+            <h4>Event Details</h4>
+
+            <p>
+                <strong>{{ event.title }}</strong><br>
+                📍 {{ event.location }}<br>
+                🕒 {{ event.start_datetime|date:"D, M d, Y · h:i A" }}
+            </p>
+
+            <hr>
+
+            {% if event.is_paid %}
+                <span class="badge-paid">Paid Event</span>
+            {% else %}
+                <span class="badge-free">Free Event</span>
+            {% endif %}
+
+            <p style="margin-top:16px; font-size:14px;">
+                Please ensure your details are correct before submitting.
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+function confirmPayment() {
+    return confirm(
+        "Confirm payment of ₹{{ event.price }}?\n\n" +
+        "This is a demo payment step.\n" +
+        "You can integrate Razorpay/Stripe later."
+    );
+}
+</script>
+
+<!-- ================= STYLES ================= -->
+<style>
+span { color: red; }
+
+.info-note {
+    margin-top: 12px;
+    color: #92400e;
+    font-size: 14px;
+}
+
+.success-note {
+    margin-top: 12px;
+    color: #166534;
+    font-size: 14px;
+}
+</style>
+
+{% endblock %}
